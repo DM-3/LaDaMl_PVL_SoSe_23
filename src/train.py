@@ -71,29 +71,41 @@ model = tf.keras.models.Sequential([
 model = tf.keras.models.Sequential([
     tf.keras.Input(shape=(48, 48, 1)),
 
+    tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
     tf.keras.layers.Conv2D(32, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
     tf.keras.layers.Conv2D(32, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
 
+    tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
     tf.keras.layers.Conv2D(48, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Conv2D(48, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
 
+    tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
     tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+
+
+    tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    # tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+
 
     tf.keras.layers.Flatten(),
 
-    tf.keras.layers.Dense(512, activation='sigmoid'),
+    tf.keras.layers.Dense(256, activation='relu'),
     tf.keras.layers.Dropout(0.5),
-    tf.keras.layers.Dense(512, activation='relu'),
+    tf.keras.layers.Dense(256, activation='relu'),
     tf.keras.layers.Dropout(0.5),
     tf.keras.layers.Dense(7)
 ])
