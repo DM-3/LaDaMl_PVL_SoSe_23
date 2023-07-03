@@ -5,7 +5,7 @@ import tensorflow as tf
 
 
 def load_data():
-    data = pd.read_csv('../data/fer2013.csv', nrows=30000)
+    data = pd.read_csv('..\\data\\fer2013.csv', nrows=30000)
     pixels = data['pixels'].apply(lambda x: np.fromstring(x, sep=' ').reshape((48, 48)))
     pixels = np.array(pixels.tolist())/255.0
     emotion = np.array(data['emotion'])
