@@ -135,7 +135,7 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
     tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv2D(48, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+    tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
     tf.keras.layers.Dropout(0.2),
