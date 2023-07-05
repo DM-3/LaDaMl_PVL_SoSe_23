@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
+from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, BatchNormalization, Flatten, Dropout, Dense
 
 
 def load_data():
@@ -115,7 +116,7 @@ model = tf.keras.models.Sequential([
 '''
 
 
-# close to Alexnet
+''' # close to Alexnet
 model = tf.keras.models.Sequential([
     tf.keras.Input(shape=(48, 48, 1)),
 
@@ -148,6 +149,67 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Dropout(0.5),
     tf.keras.layers.Dense(7)
 ])
+'''
+
+
+def create_model_0():
+    model = tf.keras.models.Sequential([
+        Input(shape=(48, 48, 1)),
+        
+        Conv2D(16, kernel_size=(3, 3), activation='relu'),
+        MaxPooling2D(pool_size=(2, 2)),
+        
+        Flatten(),
+        
+        Dense(128, activation='relu'),
+        Dense(7)
+    ])
+    return model
+    
+def create_model_1():
+    model = tf.keras.models.Sequential([
+        Input(shape=(48, 48, 1)),
+        
+        Conv2D(16, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(16, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+        
+        Flatten(),
+        
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(7)
+    ])
+    return model
+
+def create_model_2():
+    model = tf.keras.models.Sequential([
+        Input(shape=(48, 48, 1)),
+        
+        Conv2D(16, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(16, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+        
+        Conv2D(32, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(32, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+        
+        Flatten(),
+        
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(7)
+    ])
+    return model
+
+
+model = create_model_2()
 
 model.summary()
 
@@ -165,13 +227,13 @@ model.compile(
     metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
 )
 
-callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, verbose=1)
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, verbose=1)
 history = model.fit(
     x=pixels,
     y=emotion,
-    epochs=20,
+    epochs=30,
     batch_size=32,
-    validation_split=0.4,
+    validation_split=0.3,
     callbacks=[callback]
 )
 plot_history(history)
