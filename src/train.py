@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, BatchNormalization, Flatten, Dropout, Dense
+from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, BatchNormalization, Flatten, Dropout, Dense, ZeroPadding2D
+import random
 
 
 def load_data(n_elem):
@@ -28,13 +29,26 @@ def plot_select(pixels, emotion):
 
 
 def augment_data(pixels, emotion, n_elem):
+    # mirror images
     pixels = np.concatenate((pixels, pixels), 0)
     emotion = np.concatenate((emotion, emotion), 0)
     for i in range(48):
         pixels[n_elem:, :, i] = pixels[:n_elem, :, 47 - i]
-    print('data shape: ', pixels.shape)
+    n_elem *= 2
 
-    return pixels, emotion, n_elem * 2
+    # randomly shift left or right by 1 pixel
+    pixels = np.concatenate((pixels, np.zeros_like(pixels)), 0)
+    emotion = np.concatenate((emotion, emotion), 0)
+    for j in range(n_elem):
+        if random.random() < 0.5:
+            for i in range(47):
+                pixels[n_elem+j, :, i] = pixels[j, :, i+1]
+        else:
+            for i in range(47):
+                pixels[n_elem+j, :, i+1] = pixels[j, :, i]
+    n_elem *= 2
+
+    return pixels, emotion, n_elem
 
 
 def plot_history(history):
@@ -115,7 +129,7 @@ model = tf.keras.models.Sequential([
 ])
 '''
 
-''' # close to Alexnet
+''' # inspired by Alexnet
 model = tf.keras.models.Sequential([
     tf.keras.Input(shape=(48, 48, 1)),
 
@@ -152,6 +166,10 @@ model = tf.keras.models.Sequential([
 
 
 def create_model_0():
+    # learn_rate: 0.001
+    # batch_size: 32
+    # test_accuracy: 
+    # time per epoch: 22 s (MATE)
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -167,6 +185,10 @@ def create_model_0():
 
 
 def create_model_1():
+    # learn_rate: 0.001
+    # batch_size: 32
+    # test_accuracy: 
+    # time per epoch: 
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -186,6 +208,8 @@ def create_model_1():
 
 
 def create_model_2():
+    # learn_rate: 0.001
+    # batch_size: 32
     # test accuracy: 55%
     # time per epoch:
     model = tf.keras.models.Sequential([
@@ -213,8 +237,10 @@ def create_model_2():
 
 
 def create_model_3():
+    # learn_rate: 0.001
+    # batch_size: 32
     # test accuracy: 58.28%
-    # time per epoch: 300 s
+    # time per epoch:   s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -245,7 +271,133 @@ def create_model_3():
     return model
 
 
-model = create_model_3()
+def create_model_4():
+    # learn_rate: 0.0005
+    # batch_size: 16
+    # test accuracy: 59.57%
+    # time per epoch: 136 s (MATE)
+    model = tf.keras.models.Sequential([
+        Input(shape=(48, 48, 1)),
+
+        Conv2D(24, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(24, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Conv2D(48, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(48, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Conv2D(64, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        Conv2D(64, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        Conv2D(64, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Flatten(),
+
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(7)
+    ])
+    return model
+
+
+def create_model_5():
+    # learn_rate: 0.001
+    # batch_size: 32
+    # test accuracy: 58.78%
+    # time per epoch:  180 s (MATE)
+    model = tf.keras.models.Sequential([
+        tf.keras.Input(shape=(48, 48, 1)),
+
+        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
+        tf.keras.layers.Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
+        tf.keras.layers.Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+
+        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
+        tf.keras.layers.Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+
+        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
+        tf.keras.layers.Conv2D(48, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Conv2D(48, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+
+        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
+        tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+
+        tf.keras.layers.Flatten(),
+
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(7)
+    ])    
+    return model
+
+
+def create_model_6():
+    # learn_rate: 0.001
+    # batch_size: 32
+    # test accuracy: 74.27%
+    # time per epoch:  380 s (MATE)
+    model = tf.keras.models.Sequential([
+        Input(shape=(48, 48, 1)),
+
+        Conv2D(32, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(32, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Conv2D(64, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(64, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Conv2D(96, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        Conv2D(96, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        Conv2D(80, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Flatten(),
+
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(7)
+    ])
+    return model
+
+
+model = create_model_6()
 
 model.summary()
 
