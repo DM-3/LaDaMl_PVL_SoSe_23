@@ -5,10 +5,10 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, BatchNormalization, Flatten, Dropout, Dense
 
 
-def load_data():
-    data = pd.read_csv('..\\data\\fer2013.csv', nrows=30000)
+def load_data(n_elem):
+    data = pd.read_csv('..\\data\\fer2013.csv', nrows=n_elem)
     pixels = data['pixels'].apply(lambda x: np.fromstring(x, sep=' ').reshape((48, 48)))
-    pixels = np.array(pixels.tolist())/255.0
+    pixels = np.array(pixels.tolist()) / 255.0
     emotion = np.array(data['emotion'])
 
     return pixels, emotion
@@ -27,14 +27,14 @@ def plot_select(pixels, emotion):
     plt.show()
 
 
-def augment_data(pixels, emotion):
+def augment_data(pixels, emotion, n_elem):
     pixels = np.concatenate((pixels, pixels), 0)
     emotion = np.concatenate((emotion, emotion), 0)
     for i in range(48):
-        pixels[30000:,:,i] = pixels[:30000,:,47-i]
+        pixels[n_elem:, :, i] = pixels[:n_elem, :, 47 - i]
     print('data shape: ', pixels.shape)
 
-    return pixels, emotion
+    return pixels, emotion, n_elem * 2
 
 
 def plot_history(history):
@@ -115,7 +115,6 @@ model = tf.keras.models.Sequential([
 ])
 '''
 
-
 ''' # close to Alexnet
 model = tf.keras.models.Sequential([
     tf.keras.Input(shape=(48, 48, 1)),
@@ -155,53 +154,57 @@ model = tf.keras.models.Sequential([
 def create_model_0():
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
-        
+
         Conv2D(16, kernel_size=(3, 3), activation='relu'),
         MaxPooling2D(pool_size=(2, 2)),
-        
+
         Flatten(),
-        
+
         Dense(128, activation='relu'),
         Dense(7)
     ])
     return model
-    
+
+
 def create_model_1():
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
-        
+
         Conv2D(16, kernel_size=(3, 3), activation='relu'),
         BatchNormalization(),
         Conv2D(16, kernel_size=(3, 3), activation='relu'),
         BatchNormalization(),
         MaxPooling2D(pool_size=(2, 2)),
-        
+
         Flatten(),
-        
+
         Dense(128, activation='relu'),
         Dropout(0.5),
         Dense(7)
     ])
     return model
+
 
 def create_model_2():
+    # test accuracy: 55%
+    # time per epoch:
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
-        
+
         Conv2D(16, kernel_size=(3, 3), activation='relu'),
         BatchNormalization(),
         Conv2D(16, kernel_size=(3, 3), activation='relu'),
         BatchNormalization(),
         MaxPooling2D(pool_size=(2, 2)),
-        
+
         Conv2D(32, kernel_size=(3, 3), activation='relu'),
         BatchNormalization(),
         Conv2D(32, kernel_size=(3, 3), activation='relu'),
         BatchNormalization(),
         MaxPooling2D(pool_size=(2, 2)),
-        
+
         Flatten(),
-        
+
         Dense(128, activation='relu'),
         Dropout(0.5),
         Dense(7)
@@ -209,17 +212,52 @@ def create_model_2():
     return model
 
 
-model = create_model_2()
+def create_model_3():
+    # test accuracy: 58.28%
+    # time per epoch: 300 s
+    model = tf.keras.models.Sequential([
+        Input(shape=(48, 48, 1)),
+
+        Conv2D(16, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(16, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Conv2D(32, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(32, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Conv2D(64, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(64, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Flatten(),
+
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(7)
+    ])
+    return model
+
+
+model = create_model_3()
 
 model.summary()
 
 var = input()
 
+n_elem = 30000
 
-
-pixels, emotion = load_data()
+pixels, emotion = load_data(n_elem)
 plot_select(pixels, emotion)
-pixels, emotion = augment_data(pixels, emotion)
+pixels, emotion, n_elem = augment_data(pixels, emotion, n_elem)
+x_train, x_test = pixels[0:int(n_elem*0.8), :], pixels[int(n_elem*0.8):n_elem, :]
+y_train, y_test = emotion[0:int(n_elem*0.8)],   emotion[int(n_elem*0.8):n_elem]
 
 model.compile(
     optimizer=tf.keras.optimizers.Adam(0.001),
@@ -229,13 +267,19 @@ model.compile(
 
 callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, verbose=1)
 history = model.fit(
-    x=pixels,
-    y=emotion,
+    x=x_train,
+    y=y_train,
     epochs=30,
     batch_size=32,
-    validation_split=0.3,
+    validation_split=0.2,
     callbacks=[callback]
 )
 plot_history(history)
+
+print('\ntest performance: ')
+test_result = model.evaluate(x=x_test, y=y_test)
+print(str(model.metrics_names[0]) + ': ' + str(test_result[0]))
+print(str(model.metrics_names[1]) + ': ' + str(test_result[1]))
+
 
 model.save('../models')
