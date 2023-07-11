@@ -6,6 +6,8 @@ from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, BatchNormalizat
 import random
 
 
+### Utilities ###
+
 def load_data(n_elem):
     data = pd.read_csv('..\\data\\fer2013.csv', nrows=n_elem)
     pixels = data['pixels'].apply(lambda x: np.fromstring(x, sep=' ').reshape((48, 48)))
@@ -70,100 +72,7 @@ def plot_history(history):
     plt.show()
 
 
-'''
-model = tf.keras.models.Sequential([
-    tf.keras.Input(shape=(48, 48, 1)),              # input layer
-    tf.keras.layers.Cropping2D(cropping=((1, 1), (1, 1))),
-    tf.keras.layers.Conv2D(256, kernel_size=(4, 4), strides=(2, 2), activation='relu'),     # stride=(1, 1)
-    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-    tf.keras.layers.Conv2D(256, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
-    tf.keras.layers.Conv2D(128, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(1024, activation='relu'),       # 1024
-    tf.keras.layers.Dense(1024, activation='relu'),       # 1024
-    tf.keras.layers.Dense(7, activation='sigmoid')                            # output layer
-])
-'''
-
-''' # close to FER2013 paper
-model = tf.keras.models.Sequential([
-        tf.keras.Input(shape=(48, 48, 1)),
-
-    tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-    tf.keras.layers.Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-    tf.keras.layers.Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-
-    tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-    tf.keras.layers.Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-
-    tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-    tf.keras.layers.Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-
-    tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-    tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-
-    tf.keras.layers.Flatten(),
-
-    tf.keras.layers.Dense(512, activation='relu'),
-    tf.keras.layers.Dropout(0.5),
-    tf.keras.layers.Dense(512, activation='relu'),
-    tf.keras.layers.Dropout(0.5),
-    tf.keras.layers.Dense(7)
-])
-'''
-
-''' # inspired by Alexnet
-model = tf.keras.models.Sequential([
-    tf.keras.Input(shape=(48, 48, 1)),
-
-    tf.keras.layers.Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-
-    tf.keras.layers.Conv2D(32, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv2D(32, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-
-    tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-    tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-    tf.keras.layers.Dropout(0.2),
-
-    tf.keras.layers.Flatten(),
-
-    tf.keras.layers.Dense(256, activation='relu'),
-    tf.keras.layers.Dropout(0.5),
-    tf.keras.layers.Dense(256, activation='relu'),
-    tf.keras.layers.Dropout(0.5),
-    tf.keras.layers.Dense(7)
-])
-'''
-
+### CNN Models ###
 
 def create_model_0():
     # learn_rate: 0.001
@@ -403,13 +312,21 @@ model.summary()
 
 var = input()
 
-n_elem = 30000
 
+# load data set
+n_elem = 30000
 pixels, emotion = load_data(n_elem)
 plot_select(pixels, emotion)
-pixels, emotion, n_elem = augment_data(pixels, emotion, n_elem)
+
+# split into data for training and testing
 x_train, x_test = pixels[0:int(n_elem*0.8), :], pixels[int(n_elem*0.8):n_elem, :]
 y_train, y_test = emotion[0:int(n_elem*0.8)],   emotion[int(n_elem*0.8):n_elem]
+n_elem = int(n_elem * 0.8)
+
+# augment training data
+x_train, y_train, n_elem = augment_data(x_train, y_train, n_elem)
+print("# training samples: " + str(n_elem))
+
 
 model.compile(
     optimizer=tf.keras.optimizers.Adam(0.001),
