@@ -8,13 +8,13 @@ import random
 
 ### Utilities ###
 
-def load_data(n_elem):
-    data = pd.read_csv('..\\data\\fer2013.csv', nrows=n_elem)
+def load_data():
+    data = pd.read_csv('..\\data\\fer2013.csv')
     pixels = data['pixels'].apply(lambda x: np.fromstring(x, sep=' ').reshape((48, 48)))
     pixels = np.array(pixels.tolist()) / 255.0
     emotion = np.array(data['emotion'])
 
-    return pixels, emotion
+    return pixels, emotion,  pixels.shape[0]
 
 
 def plot_select(pixels, emotion):
@@ -38,6 +38,7 @@ def augment_data(pixels, emotion, n_elem):
         pixels[n_elem:, :, i] = pixels[:n_elem, :, 47 - i]
     n_elem *= 2
 
+    '''
     # randomly shift left or right by 1 pixel
     pixels = np.concatenate((pixels, np.zeros_like(pixels)), 0)
     emotion = np.concatenate((emotion, emotion), 0)
@@ -49,6 +50,7 @@ def augment_data(pixels, emotion, n_elem):
             for i in range(47):
                 pixels[n_elem+j, :, i+1] = pixels[j, :, i]
     n_elem *= 2
+    '''
 
     return pixels, emotion, n_elem
 
@@ -306,7 +308,46 @@ def create_model_6():
     return model
 
 
-model = create_model_6()
+def create_model_7():
+    # learn_rate: 0.001
+    # batch_size: 32
+    # test accuracy: 74.27%
+    # time per epoch:  380 s (MATE)
+    model = tf.keras.models.Sequential([
+        Input(shape=(48, 48, 1)),
+
+        Conv2D(16, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(16, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Conv2D(32, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        Conv2D(32, kernel_size=(3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Conv2D(64, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        Conv2D(64, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        Conv2D(64, kernel_size=(2, 2), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Flatten(),
+
+        Dense(64, activation='relu'),
+        Dropout(0.5),
+        Dense(64, activation='relu'),
+        Dropout(0.5),
+        Dense(7)
+    ])
+    return model
+
+
+model = create_model_7()
 
 model.summary()
 
@@ -314,8 +355,8 @@ var = input()
 
 
 # load data set
-n_elem = 30000
-pixels, emotion = load_data(n_elem)
+pixels, emotion, n_elem = load_data()
+print('# elements: ' + str(n_elem))
 plot_select(pixels, emotion)
 
 # split into data for training and testing
