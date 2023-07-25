@@ -31,14 +31,12 @@ def plot_select(pixels, emotion):
 
 
 def augment_data(pixels, emotion, n_elem):
-    '''
     # mirror images
     pixels = np.concatenate((pixels, pixels), 0)
     emotion = np.concatenate((emotion, emotion), 0)
     for i in range(48):
         pixels[n_elem:, :, i] = pixels[:n_elem, :, 47 - i]
     n_elem *= 2
-    '''
 
     # randomly shift left or right by 1 pixel
     pixels = np.concatenate((pixels, np.zeros_like(pixels)), 0)
@@ -52,7 +50,6 @@ def augment_data(pixels, emotion, n_elem):
                 pixels[n_elem+j, :, i+1] = pixels[j, :, i]
     n_elem *= 2
     
-
     return pixels, emotion, n_elem
 
 
@@ -313,9 +310,10 @@ def create_model_7():
     # learn_rate: 0.001
     # batch_size: 32
     # test accuracy:
-    # - base: 50.13 %
+    # - base: 50.13 %; 60 s (Mate)
     # - mirror: 59.87 %; 110-131 s (Mate)
     # - shift: 66.64 %; 110-131 s (Mate)
+    # - both: 68.77 %; 250 s (Mate)
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
