@@ -9,7 +9,7 @@ import random
 ### Utilities ###
 
 def load_data():
-    data = pd.read_csv('..\\data\\fer2013.csv')
+    data = pd.read_csv('../data/fer2013.csv')
     pixels = data['pixels'].apply(lambda x: np.fromstring(x, sep=' ').reshape((48, 48)))
     pixels = np.array(pixels.tolist()) / 255.0
     emotion = np.array(data['emotion'])
@@ -31,14 +31,15 @@ def plot_select(pixels, emotion):
 
 
 def augment_data(pixels, emotion, n_elem):
+    '''
     # mirror images
     pixels = np.concatenate((pixels, pixels), 0)
     emotion = np.concatenate((emotion, emotion), 0)
     for i in range(48):
         pixels[n_elem:, :, i] = pixels[:n_elem, :, 47 - i]
     n_elem *= 2
-
     '''
+
     # randomly shift left or right by 1 pixel
     pixels = np.concatenate((pixels, np.zeros_like(pixels)), 0)
     emotion = np.concatenate((emotion, emotion), 0)
@@ -50,7 +51,7 @@ def augment_data(pixels, emotion, n_elem):
             for i in range(47):
                 pixels[n_elem+j, :, i+1] = pixels[j, :, i]
     n_elem *= 2
-    '''
+    
 
     return pixels, emotion, n_elem
 
@@ -311,8 +312,10 @@ def create_model_6():
 def create_model_7():
     # learn_rate: 0.001
     # batch_size: 32
-    # test accuracy: 74.27%
-    # time per epoch:  380 s (MATE)
+    # test accuracy:
+    # - base: 50.13 %
+    # - mirror: 59.87 %; 110-131 s (Mate)
+    # - shift: 66.64 %; 110-131 s (Mate)
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -359,6 +362,17 @@ pixels, emotion, n_elem = load_data()
 print('# elements: ' + str(n_elem))
 plot_select(pixels, emotion)
 
+# augment data
+pixels, emotion, n_elem = augment_data(pixels, emotion, n_elem)
+
+#split into test and training data
+x_test,  y_test  = pixels[0:int(n_elem*0.2), :],        emotion[0:int(n_elem*0.2)]
+x_train, y_train = pixels[int(n_elem*0.2):n_elem, :],   emotion[int(n_elem*0.2):n_elem]
+
+print('# training samples: ' + str(int(n_elem * 0.8)))
+
+
+'''
 # split into data for training and testing
 x_train, x_test = pixels[0:int(n_elem*0.8), :], pixels[int(n_elem*0.8):n_elem, :]
 y_train, y_test = emotion[0:int(n_elem*0.8)],   emotion[int(n_elem*0.8):n_elem]
@@ -367,6 +381,8 @@ n_elem = int(n_elem * 0.8)
 # augment training data
 x_train, y_train, n_elem = augment_data(x_train, y_train, n_elem)
 print("# training samples: " + str(n_elem))
+'''
+
 
 
 model.compile(
