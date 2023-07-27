@@ -58,12 +58,12 @@ def plot_history(history):
     x = np.arange(start=1, stop=len(history.history['loss']) + 1, step=1)
 
     ax1.plot(x, history.history['sparse_categorical_accuracy'], color='r', label='train')
-    ax1.plot(x, history.history['val_sparse_categorical_accuracy'], color='g', label='test')
+    ax1.plot(x, history.history['val_sparse_categorical_accuracy'], color='g', label='val')
     ax1.set_ylabel('accuracy')
     ax1.legend(loc='upper left')
 
     ax2.plot(x, history.history['loss'], color='y', label='train')
-    ax2.plot(x, history.history['val_loss'], color='b', label='test')
+    ax2.plot(x, history.history['val_loss'], color='b', label='val')
     ax2.set_ylabel('loss')
     ax2.set_xlabel('epoch')
     plt.legend(loc='upper right')
@@ -75,10 +75,12 @@ def plot_history(history):
 ### CNN Models ###
 
 def create_model_0():
+    # params: 1'084'583
+    # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
-    # test_accuracy: 
-    # time per epoch: 22 s (MATE)
+    # test_accuracy: 47.14 %
+    # time per epoch: 16 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -94,10 +96,12 @@ def create_model_0():
 
 
 def create_model_1():
+    # params: 994'871
+    # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
-    # test_accuracy: 
-    # time per epoch: 
+    # test_accuracy: 45.79 %
+    # time per epoch: 40 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -117,10 +121,12 @@ def create_model_1():
 
 
 def create_model_2():
+    # params: 349'559
+    # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
-    # test accuracy: 55%
-    # time per epoch:
+    # test accuracy: 52.65 %
+    # time per epoch: 52 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -146,10 +152,12 @@ def create_model_2():
 
 
 def create_model_3():
+    # params: 126'967
+    # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
-    # test accuracy: 58.28%
-    # time per epoch:   s
+    # test accuracy: 55.33 %
+    # time per epoch: 54 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -181,10 +189,12 @@ def create_model_3():
 
 
 def create_model_4():
+    # params: 174511
+    # augmentation: none
     # learn_rate: 0.0005
     # batch_size: 16
-    # test accuracy: 59.57%
-    # time per epoch: 136 s (MATE)
+    # test accuracy: 54.69 %
+    # time per epoch: 86 s (MATE)
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -220,10 +230,12 @@ def create_model_4():
 
 
 def create_model_5():
+    # params: 145'495
+    # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
-    # test accuracy: 58.78%
-    # time per epoch:  180 s (MATE)
+    # test accuracy: 55.48%
+    # time per epoch:  70 s (MATE)
     model = tf.keras.models.Sequential([
         tf.keras.Input(shape=(48, 48, 1)),
 
@@ -268,6 +280,8 @@ def create_model_5():
 
 
 def create_model_6():
+    # params: 268'983
+    # augmentation: all
     # learn_rate: 0.001
     # batch_size: 32
     # test accuracy: 74.27%
@@ -348,7 +362,8 @@ def create_model_7():
     return model
 
 
-model = create_model_7()
+# model = create_model_7()
+model = create_model_0()
 
 model.summary()
 
@@ -368,19 +383,6 @@ x_test,  y_test  = pixels[0:int(n_elem*0.2), :],        emotion[0:int(n_elem*0.2
 x_train, y_train = pixels[int(n_elem*0.2):n_elem, :],   emotion[int(n_elem*0.2):n_elem]
 
 print('# training samples: ' + str(int(n_elem * 0.8)))
-
-
-'''
-# split into data for training and testing
-x_train, x_test = pixels[0:int(n_elem*0.8), :], pixels[int(n_elem*0.8):n_elem, :]
-y_train, y_test = emotion[0:int(n_elem*0.8)],   emotion[int(n_elem*0.8):n_elem]
-n_elem = int(n_elem * 0.8)
-
-# augment training data
-x_train, y_train, n_elem = augment_data(x_train, y_train, n_elem)
-print("# training samples: " + str(n_elem))
-'''
-
 
 
 model.compile(
