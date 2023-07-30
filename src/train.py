@@ -75,12 +75,12 @@ def plot_history(history):
 ### CNN Models ###
 
 def create_model_0():
-    # params: 1'084'583
+    # parameters: 1'084'583
     # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
-    # test_accuracy: 47.14 %
-    # time per epoch: 16 s
+    # test_accuracy: 47.14%
+    # time per epoch: 20 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -96,11 +96,11 @@ def create_model_0():
 
 
 def create_model_1():
-    # params: 994'871
+    # parameters: 994'871
     # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
-    # test_accuracy: 45.79 %
+    # test_accuracy: 45.79%
     # time per epoch: 40 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
@@ -121,11 +121,11 @@ def create_model_1():
 
 
 def create_model_2():
-    # params: 349'559
+    # parameters: 349'559
     # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
-    # test accuracy: 52.65 %
+    # test accuracy: 52.65%
     # time per epoch: 52 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
@@ -152,11 +152,11 @@ def create_model_2():
 
 
 def create_model_3():
-    # params: 126'967
+    # parameters: 126'967
     # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
-    # test accuracy: 55.33 %
+    # test accuracy: 55.33%
     # time per epoch: 54 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
@@ -189,12 +189,12 @@ def create_model_3():
 
 
 def create_model_4():
-    # params: 174511
+    # parameters: 174'511
     # augmentation: none
     # learn_rate: 0.0005
     # batch_size: 16
-    # test accuracy: 54.69 %
-    # time per epoch: 86 s (MATE)
+    # test accuracy: 54.69%
+    # time per epoch: 86 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -230,62 +230,62 @@ def create_model_4():
 
 
 def create_model_5():
-    # params: 145'495
+    # parameters: 145'495
     # augmentation: none
     # learn_rate: 0.001
     # batch_size: 32
     # test accuracy: 55.48%
-    # time per epoch:  70 s (MATE)
+    # time per epoch:  70 s
     model = tf.keras.models.Sequential([
         tf.keras.Input(shape=(48, 48, 1)),
 
-        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-        tf.keras.layers.Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-        tf.keras.layers.Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+        ZeroPadding2D(padding=(1, 1)),
+        Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
+        BatchNormalization(),
+        ZeroPadding2D(padding=(1, 1)),
+        Conv2D(16, kernel_size=(3, 3), strides=(1, 1), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
 
-        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-        tf.keras.layers.Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+        ZeroPadding2D(padding=(1, 1)),
+        Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        BatchNormalization(),
+        Conv2D(32, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
 
-        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-        tf.keras.layers.Conv2D(48, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Conv2D(48, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+        ZeroPadding2D(padding=(1, 1)),
+        Conv2D(48, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        BatchNormalization(),
+        Conv2D(48, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
 
-        tf.keras.layers.ZeroPadding2D(padding=(1, 1)),
-        tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+        ZeroPadding2D(padding=(1, 1)),
+        Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        BatchNormalization(),
+        Conv2D(64, kernel_size=(2, 2), strides=(1, 1), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=(2, 2)),
 
-        tf.keras.layers.Flatten(),
+        Flatten(),
 
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dropout(0.5),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dropout(0.5),
-        tf.keras.layers.Dense(7)
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(7)
     ])    
     return model
 
 
 def create_model_6():
-    # params: 268'983
-    # augmentation: all
+    # parameters: 268'983
+    # augmentation: mirror, shift
     # learn_rate: 0.001
     # batch_size: 32
     # test accuracy: 74.27%
-    # time per epoch:  380 s (MATE)
+    # time per epoch:  380 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -321,13 +321,14 @@ def create_model_6():
 
 
 def create_model_7():
+    # parameters: 100'215
     # learn_rate: 0.001
     # batch_size: 32
     # test accuracy:
-    # - base: 50.13 %; 60 s (Mate)
-    # - mirror: 59.87 %; 110-131 s (Mate)
-    # - shift: 66.64 %; 110-131 s (Mate)
-    # - both: 68.77 %; 250 s (Mate)
+    # - base: 50.13%; 60 s
+    # - mirror: 59.87%; 110-131 s
+    # - shift: 66.64%; 110-131 s
+    # - both: 68.77%; 250 s
     model = tf.keras.models.Sequential([
         Input(shape=(48, 48, 1)),
 
@@ -362,12 +363,8 @@ def create_model_7():
     return model
 
 
-# model = create_model_7()
-model = create_model_0()
-
+model = create_model_7()
 model.summary()
-
-var = input()
 
 
 # load data set
